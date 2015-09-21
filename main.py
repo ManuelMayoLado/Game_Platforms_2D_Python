@@ -21,6 +21,8 @@ pygame.init()
 
 ventana = pygame.display.set_mode(RESOLUCION,pygame.FULLSCREEN|pygame.DOUBLEBUF|pygame.HWSURFACE)
 
+Superficie_tiles = pygame.Surface((ANCHO_XOGO,ALTO_XOGO), pygame.SRCALPHA|pygame.HWSURFACE).convert()
+
 pygame.display.set_caption("Xogo_Plataformas")
 
 #------------------------------------------------------------------------
