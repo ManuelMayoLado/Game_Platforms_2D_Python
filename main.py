@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from constantes import *
+from clases import *
 
 import ctypes
 import os
@@ -12,6 +13,30 @@ if os.name == 'nt' and sys.getwindowsversion()[0] >= 6:
 #VARIABLES
 
 pos_camara = [0,0]
+
+nivel = 0
+
+tamanho_niveles = [[50,20],[500,300]]
+
+NUM_CADROS_ANCHO_XOGO = tamanho_niveles[nivel][0]
+NUM_CADROS_ALTO_XOGO = tamanho_niveles[nivel][1]
+
+NUM_CADROS_TOTALES = NUM_CADROS_ANCHO_XOGO*NUM_CADROS_ALTO_XOGO
+
+lista_cadros = []
+
+#FUNCIONS SENCILLAS
+
+def pos(n):
+	return [n % NUM_CADROS_ANCHO_XOGO, n / NUM_CADROS_ANCHO_XOGO]
+
+def num(p):
+	return p[0]+p[1]*NUM_CADROS_ANCHO_XOGO
+
+#LISTA DE CADROS(TILES)
+
+for i in range(NUM_CADROS_TOTALES):
+	lista_cadros.append(cadro(i,pos(i),False,False))
 
 #INICIAR PYGAME
 
@@ -25,6 +50,22 @@ Superficie_tiles = pygame.Surface((ANCHO_XOGO,ALTO_XOGO), pygame.SRCALPHA|pygame
 
 pygame.display.set_caption("Xogo_Plataformas")
 
+#DEBUXAR CADROS EN SUPERFICIE
+
+Superficie_tiles.fill((0,0,0))
+
+'''
+####USAR MELLOR FILL
+'''
+
+'''
+pygame.draw.rect(Superficie_tiles,[200,100,100],rect_cadro)
+
+for i in lista_cadros:
+	if i.bool:
+		rect_cadro = pygame.Rect(i.pos[0]*ANCHO_CADRO,i.pos[1]*ALTO_CADRO,ANCHO_PANTALLA,ALTO_CADRO)
+		pygame.draw.rect(Superficie_tiles,[200,100,100],rect_cadro)
+'''
 #------------------------------------------------------------------------
 #BUCLE XOGO
 #------------------------------------------------------------------------
@@ -44,6 +85,8 @@ def main():
 		############################################
 
 		ventana.fill((255,255,255))
+
+		ventana.blit(Superficie_tiles,[0,0])
 
 		#DEBUXAR CADRICULA
 
