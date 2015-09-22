@@ -2,6 +2,7 @@
 
 from constantes import *
 from clases import *
+from funcions import *
 
 import ctypes
 import os
@@ -16,14 +17,18 @@ pos_camara = [0,0]
 
 nivel = 0
 
-tamanho_niveles = [[50,20],[500,300]]
+tamanho_niveles = [[200,100],[500,300]]
 
 NUM_CADROS_ANCHO_XOGO = tamanho_niveles[nivel][0]
 NUM_CADROS_ALTO_XOGO = tamanho_niveles[nivel][1]
 
 NUM_CADROS_TOTALES = NUM_CADROS_ANCHO_XOGO*NUM_CADROS_ALTO_XOGO
 
-lista_cadros = []
+lista_cadros_colision = []
+
+#PERSONAJE
+
+pj = personaxe(0,[20,50],1,objeto_fisico([0,0],0.3,[0,0]))
 
 #FUNCIONS SENCILLAS
 
@@ -36,7 +41,9 @@ def num(p):
 #LISTA DE CADROS(TILES)
 
 for i in range(NUM_CADROS_TOTALES):
-	lista_cadros.append(cadro(i,pos(i),False,False))
+	lista_cadros_colision.append(0)
+
+lista_cadros_colision = cargar_lista_cadros_colision("mapa_colisions.txt",lista_cadros_colision)
 
 #INICIAR PYGAME
 
@@ -46,28 +53,21 @@ pygame.init()
 
 ventana = pygame.display.set_mode(RESOLUCION,pygame.FULLSCREEN|pygame.DOUBLEBUF|pygame.HWSURFACE)
 
-Superficie_tiles = pygame.Surface((ANCHO_XOGO,ALTO_XOGO), pygame.SRCALPHA|pygame.HWSURFACE).convert()
+Superficie_tiles = pygame.Surface((ANCHO_XOGO,ALTO_XOGO),pygame.SRCALPHA|pygame.HWSURFACE).convert_alpha()
 
 pygame.display.set_caption("Xogo_Plataformas")
 
-#DEBUXAR CADROS EN SUPERFICIE
+#DEBUXAR CADROS-COLISION EN SUPERFICIE
 
-Superficie_tiles.fill((0,0,0))
+for i in range(len(lista_cadros_colision)):
+	if lista_cadros_colision[i]:
+		rect_cadro_colision = pygame.Rect(pos(i)[0]*ANCHO_CADRO,pos(i)[1]*ALTO_CADRO,ANCHO_CADRO,ALTO_CADRO)
+		Superficie_tiles.fill([200,50,50],rect_cadro_colision)
 
-'''
-####USAR MELLOR FILL
-'''
+print lista_cadros_colision
 
-'''
-pygame.draw.rect(Superficie_tiles,[200,100,100],rect_cadro)
-
-for i in lista_cadros:
-	if i.bool:
-		rect_cadro = pygame.Rect(i.pos[0]*ANCHO_CADRO,i.pos[1]*ALTO_CADRO,ANCHO_PANTALLA,ALTO_CADRO)
-		pygame.draw.rect(Superficie_tiles,[200,100,100],rect_cadro)
-'''
 #------------------------------------------------------------------------
-#BUCLE XOGO
+#FUNCION MAIN
 #------------------------------------------------------------------------
 
 ON = True
@@ -75,6 +75,9 @@ ON = True
 def main():
 
 	global ON
+
+	#BUCLE XOGO
+	#----------
 
 	while ON:
 
@@ -85,8 +88,6 @@ def main():
 		############################################
 
 		ventana.fill((255,255,255))
-
-		ventana.blit(Superficie_tiles,[0,0])
 
 		#DEBUXAR CADRICULA
 
@@ -100,9 +101,36 @@ def main():
 							 (0,i*ALTO_CADRO),
 							 (ANCHO_XOGO,i*ALTO_CADRO))
 
+		ventana.blit(Superficie_tiles,[0,0])
+
+		#DEBUXAR PJ
+
+		rect_pj = pygame.Rect(pj.pos,[ANCHO_CADRO,ALTO_CADRO*2])
+		pygame.draw.rect(ventana,[0,0,200],rect_pj)
+
+		###########################################
+		#FISICA
+		###########################################
+
+		pj.fisica.vel[1] += pj.fisica.gravedad
+
+		pj.pos = pj.pos[0]+pj.fisica.vel[0],pj.pos[1]+pj.fisica.vel[1]
+
+
 		############################################
 		#EVENTOS
 		############################################
+
+		######TECLAS PULSADAS######
+
+		tecla_pulsada = pygame.key.get_pressed()
+
+		if tecla_pulsada[K_RIGHT] or tecla_pulsada[K_d]:
+			pj.fisica.vel[0] = 5
+
+		if tecla_pulsada[K_LEFT] or tecla_pulsada[K_a]:
+			pj.fisica.vel[0] = -5
+
 
 		for evento in pygame.event.get():
 
