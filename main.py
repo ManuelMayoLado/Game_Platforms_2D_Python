@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import division
+
 from constantes import *
 from clases import *
 from funcions import *
@@ -12,8 +14,6 @@ if os.name == 'nt' and sys.getwindowsversion()[0] >= 6:
 	ctypes.windll.user32.SetProcessDPIAware()
 
 #VARIABLES
-
-pos_camara = [0,0]
 
 nivel = 0
 
@@ -51,9 +51,9 @@ pygame.init()
 
 #PANTALLA
 
-ventana = pygame.display.set_mode(RESOLUCION,pygame.FULLSCREEN|pygame.DOUBLEBUF|pygame.HWSURFACE)
+ventana = pygame.display.set_mode([ANCHO_VENTANA,ALTO_VENTANA],pygame.OPENGL|pygame.DOUBLEBUF|pygame.HWSURFACE|pygame.RESIZABLE)
 
-Superficie_tiles = pygame.Surface((ANCHO_XOGO,ALTO_XOGO),pygame.SRCALPHA|pygame.HWSURFACE).convert_alpha()
+Superficie_tiles = pygame.Surface((ANCHO_FASE,ALTO_FASE),pygame.SRCALPHA|pygame.HWSURFACE).convert_alpha()
 
 pygame.display.set_caption("Xogo_Plataformas")
 
@@ -63,8 +63,6 @@ for i in range(len(lista_cadros_colision)):
 	if lista_cadros_colision[i]:
 		rect_cadro_colision = pygame.Rect(pos(i)[0]*ANCHO_CADRO,pos(i)[1]*ALTO_CADRO,ANCHO_CADRO,ALTO_CADRO)
 		Superficie_tiles.fill([200,50,50],rect_cadro_colision)
-
-print lista_cadros_colision
 
 #------------------------------------------------------------------------
 #FUNCION MAIN
@@ -76,37 +74,32 @@ def main():
 
 	global ON
 
+	init_gl()
+
 	#BUCLE XOGO
-	#----------
+	#-----------------
 
 	while ON:
 
 		reloj = pygame.time.Clock()
 
+		limpiar_ventana_gl()
+
 		############################################
 		#DEBUXADO
 		############################################
 
-		ventana.fill((255,255,255))
-
 		#DEBUXAR CADRICULA
 
-		for i in range(NUM_CADROS_ANCHO_XOGO):
-			pygame.draw.line(ventana,(200,200,200),
-							 (i*ANCHO_CADRO,0),
-							 (i*ANCHO_CADRO,ALTO_XOGO))
+		for i in range(NUM_CADROS_ANCHO_FASE):
+			debuxar_linha([[i*ANCHO_CADRO,0],[i*ANCHO_CADRO,ANCHO_FASE]])
 
-		for i in range(NUM_CADROS_ALTO_XOGO):
-			pygame.draw.line(ventana,(200,200,200),
-							 (0,i*ALTO_CADRO),
-							 (ANCHO_XOGO,i*ALTO_CADRO))
-
-		ventana.blit(Superficie_tiles,[0,0])
+		for i in range(NUM_CADROS_ALTO_FASE):
+			debuxar_linha([[0,i*ALTO_CADRO],[ALTO_FASE,i*ALTO_CADRO]])
 
 		#DEBUXAR PJ
 
-		rect_pj = pygame.Rect(pj.pos,[ANCHO_CADRO,ALTO_CADRO*2])
-		pygame.draw.rect(ventana,[0,0,200],rect_pj)
+		ver = [[0,0],[5,0],[5,5],[0,5]]
 
 		###########################################
 		#FISICA
@@ -148,7 +141,7 @@ def main():
 			pygame.display.quit()
 			break
 
-		pygame.display.update()
+		pygame.display.flip()
 
 		reloj.tick(FPS)
 

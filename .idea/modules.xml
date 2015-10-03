@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/Xogo_Plataformas-en-Python.iml" filepath="$PROJECT_DIR$/.idea/Xogo_Plataformas-en-Python.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/Python_Xogo_Plataformas.iml" filepath="$PROJECT_DIR$/.idea/Python_Xogo_Plataformas.iml" />
     </modules>
   </component>
 </project>
