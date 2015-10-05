@@ -51,7 +51,6 @@ def debuxar_rect_gl(vertices):
 def debuxar_linha(vertices):
     glLoadIdentity()
     glBegin(GL_LINES)
-    glColor4f(0.5, 0.5, 0.5, 0.5)
     for i in vertices:
         glVertex2f(i[0],i[1])
     glEnd()

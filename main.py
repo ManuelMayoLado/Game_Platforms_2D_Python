@@ -177,30 +177,13 @@ def main():
 		#FISICA
 		###########################################
 
-		pj.fisica.vel[1] -= pj.fisica.gravedad
+		#pj.fisica.vel[1] -= pj.fisica.gravedad
 
 		for impulso in pj.fisica.impulsos:
 			pj.fisica.vel[0] += impulso[0]
 			pj.fisica.vel[1] += impulso[1]
 
 		pj.pos = pj.pos[0]+pj.fisica.vel[0],pj.pos[1]+pj.fisica.vel[1]
-
-		############################################
-		#EVENTOS
-		############################################
-
-		######TECLAS PULSADAS######
-
-		tecla_pulsada = pygame.key.get_pressed()
-
-		if tecla_pulsada[K_d]:
-			pj.fisica.vel[0] = 1
-
-		if tecla_pulsada[K_a]:
-			pj.fisica.vel[0] = -1
-
-		if tecla_pulsada[K_d] and tecla_pulsada[K_a] or not(tecla_pulsada[K_d] or tecla_pulsada[K_a]):
-			pj.fisica.vel[0] = 0
 
 		#CAMARA
 
@@ -222,6 +205,39 @@ def main():
 
 			pos_camara[1] = max(pos_camara[1], 0)
 			pos_camara[1] = min(pos_camara[1], ALTO_FASE-ALTO_PANTALLA_GL)
+
+		############################################
+		#EVENTOS
+		############################################
+
+		###### TECLAS PULSADAS ######
+
+		tecla_pulsada = pygame.key.get_pressed()
+
+		if tecla_pulsada[K_d]:
+			pj.fisica.vel[0] = 1
+
+		if tecla_pulsada[K_a]:
+			pj.fisica.vel[0] = -1
+
+		if tecla_pulsada[K_d] and tecla_pulsada[K_a] or not(tecla_pulsada[K_d] or tecla_pulsada[K_a]):
+			pj.fisica.vel[0] = 0
+
+		####### MOUSE ########
+
+		pos_mouse = pygame.mouse.get_pos()
+
+		if pos_mouse[0] >= MARCO_LATERAL/2 and pos_mouse[0] <= ANCHO_VENTANA-MARCO_LATERAL/2:
+			pos_mouse_gl = [(pos_mouse[0]-MARCO_LATERAL/2)*ANCHO_PANTALLA_GL/(ANCHO_VENTANA-MARCO_LATERAL)+pos_camara[0],
+						ALTO_PANTALLA_GL-(pos_mouse[1]*ALTO_PANTALLA_GL/ALTO_VENTANA)+pos_camara[1]]
+		else:
+			pos_mouse_gl = False
+
+
+		if pos_mouse_gl:
+			glColor4f(1, 0, 0, 1)
+			debuxar_linha([[pos_mouse_gl[0],pos_camara[1]],[pos_mouse_gl[0],ALTO_PANTALLA_GL+pos_camara[1]]])
+			debuxar_linha([[pos_camara[0],pos_mouse_gl[1]],[ANCHO_PANTALLA_GL+pos_camara[0],pos_mouse_gl[1]]])
 
 
 		#EVENTOS
