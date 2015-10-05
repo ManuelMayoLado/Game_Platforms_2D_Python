@@ -12,10 +12,10 @@ class fase:
         self.alto = cadros_alto * ALTO_CADRO
 
 class objeto_fisico:
-    def __init__(self,vel,gravedad,impulso):
+    def __init__(self,vel,gravedad,impulsos):
         self.vel = vel
         self.gravedad = gravedad
-        self.impulso = impulso
+        self.impulsos = impulsos
 
 class personaxe:
     def __init__(self,imagen,pos,estado,fisica):

@@ -7,6 +7,12 @@ from OpenGL.GLU import *
 
 from constantes import *
 
+def pos(n, num_cadros_ancho_fase):
+	return [n % num_cadros_ancho_fase, n / num_cadros_ancho_fase]
+
+def num(p, num_cadros_ancho_fase):
+	return p[0]+p[1]*num_cadros_ancho_fase
+
 def cargar_lista_cadros_colision(archivo,lista):
     text = open(archivo,"r").read()
     cont = 0
@@ -38,7 +44,6 @@ def debuxar_rect_gl(vertices):
     glLoadIdentity()
     glBegin(GL_QUADS)
     #glTranslatef(pos[0], pos[1], 0)
-    glColor4f(1, 1, 1, 1)
     for i in vertices:
         glVertex2f(i[0],i[1])
     glEnd()
