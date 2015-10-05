@@ -1,6 +1,16 @@
+# -*- coding: utf-8 -*-
+
+from __future__ import division
+
 import pygame
 
 from pygame.locals import *
+
+def simplificar_fraccion(dividendo, divisor):
+        for i in range(dividendo,2,-1):
+            if dividendo%i == 0 and divisor%i == 0:
+                    return dividendo/i, divisor/i
+        return None
 
 #CONSTANTES
 
@@ -8,26 +18,27 @@ pygame.display.init()
 
 FPS = 60
 
-RESOLUCION = [pygame.display.Info().current_w,  pygame.display.Info().current_h]
+RESOLUCION = [pygame.display.Info().current_w,pygame.display.Info().current_h]
 
-ANCHO_VENTANA = 500
-ALTO_VENTANA = 500
+#RESOLUCION = 1200,600
 
-ANCHO_PANTALLA_GL = 500
-ALTO_PANTALLA_GL = 500
+ANCHO_VENTANA, ALTO_VENTANA = RESOLUCION
 
-ANCHO_FASE = ANCHO_PANTALLA_GL * 4
-ALTO_FASE = ALTO_PANTALLA_GL * 2
+ASPECTRO = RESOLUCION[0]/RESOLUCION[1]
+ASPECTRO_P =  simplificar_fraccion(*RESOLUCION)
 
-REL_CADROS_PANTALLA = 100
+print ASPECTRO_P
 
-NUM_CADROS_ANCHO_FASE = int(REL_CADROS_PANTALLA * (ANCHO_VENTANA/float(ALTO_VENTANA)))
-NUM_CADROS_ALTO_FASE = REL_CADROS_PANTALLA
+DIMENSIONS_GL = 150
+DIMENSIONS_GL_ESTANDAR = DIMENSIONS_GL*1.333
 
-ANCHO_CADRO = ANCHO_VENTANA / float(NUM_CADROS_ANCHO_FASE)
-ALTO_CADRO = ALTO_VENTANA / float(NUM_CADROS_ALTO_FASE)
+ANCHO_PANTALLA_GL = DIMENSIONS_GL*ASPECTRO
+ALTO_PANTALLA_GL = DIMENSIONS_GL
 
-MARCO_LATERAL = 0
+ANCHO_CADRO = 5
+ALTO_CADRO = 5
+
+MARCO_LATERAL = int(ANCHO_VENTANA - ((DIMENSIONS_GL_ESTANDAR*ANCHO_VENTANA)/ANCHO_PANTALLA_GL))
 MARCO_VERTICAL = 0
 
 COLOR_LIMPIADO = [1,1,1,1]

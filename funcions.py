@@ -1,4 +1,6 @@
-#FUNCIONS
+# -*- coding: utf-8 -*-
+
+#### FUNCIONS ####
 
 from OpenGL.GL import *
 from OpenGL.GLU import *
@@ -16,19 +18,20 @@ def cargar_lista_cadros_colision(archivo,lista):
 #OPENGL
 
 def init_gl():
-    glViewport(0,0,ANCHO_VENTANA,ALTO_VENTANA)
-    glClearColor(*COLOR_LIMPIADO)
+    glViewport(MARCO_LATERAL/2,0,ANCHO_VENTANA-MARCO_LATERAL,ALTO_VENTANA)
+    glClearColor(0,0,0,0)
     glEnable(GL_BLEND)
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-    glEnable(GL_LINE_SMOOTH)
-    glHint(GL_LINE_SMOOTH_HINT, GL_NICEST)
+    #glEnable(GL_LINE_SMOOTH)
+    #glHint(GL_LINE_SMOOTH_HINT, GL_NICEST)
+
 
 def limpiar_ventana_gl():
     glClear(GL_COLOR_BUFFER_BIT)
     glMatrixMode(GL_PROJECTION)
     glLoadIdentity()
-    gluOrtho2D(0,ANCHO_PANTALLA_GL,0,ALTO_PANTALLA_GL)
-    glTranslatef(0+pos_camara[0],0+pos_camara[1],0)
+    gluOrtho2D(0,DIMENSIONS_GL_ESTANDAR,0,DIMENSIONS_GL)
+    glTranslatef(0-pos_camara[0],0-pos_camara[1],0)
     glMatrixMode(GL_MODELVIEW)
 
 def debuxar_rect_gl(vertices):

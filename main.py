@@ -13,18 +13,13 @@ import sys
 if os.name == 'nt' and sys.getwindowsversion()[0] >= 6:
 	ctypes.windll.user32.SetProcessDPIAware()
 
-#VARIABLES
+#FASES
 
-nivel = 0
+lista_fases = [fase(0,100,30,"mapa_colisions.txt")]
 
-tamanho_niveles = [[200,100],[500,300]]
+fase_cargada = False
 
-NUM_CADROS_ANCHO_XOGO = tamanho_niveles[nivel][0]
-NUM_CADROS_ALTO_XOGO = tamanho_niveles[nivel][1]
-
-NUM_CADROS_TOTALES = NUM_CADROS_ANCHO_XOGO*NUM_CADROS_ALTO_XOGO
-
-lista_cadros_colision = []
+num_fase = 0
 
 #PERSONAJE
 
@@ -32,70 +27,113 @@ pj = personaxe(0,[20,50],1,objeto_fisico([0,0],0.3,[0,0]))
 
 #FUNCIONS SENCILLAS
 
+NUM_CADROS_ANCHO_XOGO = 0
+
 def pos(n):
 	return [n % NUM_CADROS_ANCHO_XOGO, n / NUM_CADROS_ANCHO_XOGO]
 
 def num(p):
 	return p[0]+p[1]*NUM_CADROS_ANCHO_XOGO
 
-#LISTA DE CADROS(TILES)
-
-for i in range(NUM_CADROS_TOTALES):
-	lista_cadros_colision.append(0)
-
-lista_cadros_colision = cargar_lista_cadros_colision("mapa_colisions.txt",lista_cadros_colision)
-
 #INICIAR PYGAME
 
 pygame.init()
 
-#PANTALLA
+#VENTANA
 
-ventana = pygame.display.set_mode([ANCHO_VENTANA,ALTO_VENTANA],pygame.OPENGL|pygame.DOUBLEBUF|pygame.HWSURFACE|pygame.RESIZABLE)
-
-Superficie_tiles = pygame.Surface((ANCHO_FASE,ALTO_FASE),pygame.SRCALPHA|pygame.HWSURFACE).convert_alpha()
+ventana = pygame.display.set_mode([ANCHO_VENTANA,ALTO_VENTANA],FULLSCREEN|OPENGL|DOUBLEBUF|HWSURFACE)
 
 pygame.display.set_caption("Xogo_Plataformas")
-
-#DEBUXAR CADROS-COLISION EN SUPERFICIE
-
-for i in range(len(lista_cadros_colision)):
-	if lista_cadros_colision[i]:
-		rect_cadro_colision = pygame.Rect(pos(i)[0]*ANCHO_CADRO,pos(i)[1]*ALTO_CADRO,ANCHO_CADRO,ALTO_CADRO)
-		Superficie_tiles.fill([200,50,50],rect_cadro_colision)
 
 #------------------------------------------------------------------------
 #FUNCION MAIN
 #------------------------------------------------------------------------
 
-ON = True
+_ON = True
 
 def main():
 
-	global ON
+	global _ON
+	global _fase_cargada
 
 	init_gl()
 
 	#BUCLE XOGO
 	#-----------------
 
-	while ON:
+	while _ON:
 
 		reloj = pygame.time.Clock()
 
+		#### CARGA DE FASE ####
+		#######################
+
+		if not fase_cargada:
+
+			fase_actual = lista_fases[num_fase]
+
+			#VARIABLES
+
+			NUM_CADROS_ANCHO_FASE = fase_actual.cadros_ancho
+			NUM_CADROS_ALTO_FASE = fase_actual.cadros_alto
+			NUM_CADROS_TOTALES_FASE = NUM_CADROS_ANCHO_FASE * NUM_CADROS_ALTO_FASE
+			lista_cadros_colision = []
+			for i in range(NUM_CADROS_TOTALES_FASE):
+				lista_cadros_colision.append(0)
+			lista_cadros_colision = cargar_lista_cadros_colision(fase_actual.doc_col,lista_cadros_colision)
+
+			ANCHO_FASE = fase_actual.ancho
+			ALTO_FASE = fase_actual.alto
+
+			vertices_cadricula = []
+
+			for i in range(NUM_CADROS_ANCHO_FASE+1):
+				vertices_cadricula.append([i*ANCHO_CADRO,0])
+				vertices_cadricula.append([i*ANCHO_CADRO,ALTO_FASE])
+
+			for i in range(NUM_CADROS_ALTO_FASE+1):
+				vertices_cadricula.append([0,i*ALTO_CADRO])
+				vertices_cadricula.append([ANCHO_FASE,i*ALTO_CADRO])
+
+			#LISTAS DE OPENGL
+
+			#CADRICULA
+
+			LISTA_CADRICULA = glGenLists(1)
+			glNewList(LISTA_CADRICULA, GL_COMPILE) ### INICIO LISTA
+			glLoadIdentity()
+			glBegin(GL_LINES)
+			glColor4f(0.5, 0.5, 0.5, 0.5)
+			for v in vertices_cadricula:
+				glVertex2f(v[0],v[1])
+			glEnd()
+			glEndList()	############################### FIN LISTA
+
+			_fase_cargada = True
+
+		#######################
+
+		#LIMPIAR VENTANA
+
 		limpiar_ventana_gl()
+
+		glLoadIdentity()
+		glBegin(GL_QUADS)
+		glColor4f(*COLOR_LIMPIADO)
+		glVertex2f(pos_camara[0],pos_camara[1])
+		glVertex2f(ANCHO_VENTANA+pos_camara[0],pos_camara[1])
+		glVertex2f(ANCHO_VENTANA+pos_camara[0],ALTO_VENTANA+pos_camara[1])
+		glVertex2f(pos_camara[0],ALTO_VENTANA+pos_camara[1])
+		glEnd()
+
 
 		############################################
 		#DEBUXADO
 		############################################
 
-		#DEBUXAR CADRICULA
+		#CADRICULA
 
-		for i in range(NUM_CADROS_ANCHO_FASE):
-			debuxar_linha([[i*ANCHO_CADRO,0],[i*ANCHO_CADRO,ANCHO_FASE]])
-
-		for i in range(NUM_CADROS_ALTO_FASE):
-			debuxar_linha([[0,i*ALTO_CADRO],[ALTO_FASE,i*ALTO_CADRO]])
+		glCallList(LISTA_CADRICULA)
 
 		#DEBUXAR PJ
 
@@ -118,12 +156,24 @@ def main():
 
 		tecla_pulsada = pygame.key.get_pressed()
 
-		if tecla_pulsada[K_RIGHT] or tecla_pulsada[K_d]:
+		if tecla_pulsada[K_d]:
 			pj.fisica.vel[0] = 5
 
-		if tecla_pulsada[K_LEFT] or tecla_pulsada[K_a]:
+		if tecla_pulsada[K_a]:
 			pj.fisica.vel[0] = -5
 
+		#CAMARA
+
+		if tecla_pulsada[K_RIGHT]:
+			pos_camara[0] += 1
+		if tecla_pulsada[K_LEFT]:
+			pos_camara[0] -= 1
+		if tecla_pulsada[K_UP]:
+			pos_camara[1] += 1
+		if tecla_pulsada[K_DOWN]:
+			pos_camara[1] -= 1
+
+		#EVENTOS
 
 		for evento in pygame.event.get():
 
@@ -131,13 +181,13 @@ def main():
 			if evento.type == pygame.KEYDOWN:
 				#ESC
 				if evento.key == K_ESCAPE:
-					ON = False
+					_ON = False
 
 			#QUIT
 			if evento.type == pygame.QUIT:
-				ON = False
+				_ON = False
 
-		if not ON:
+		if not _ON:
 			pygame.display.quit()
 			break
 
