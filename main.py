@@ -235,9 +235,14 @@ def main():
 
 
 		if pos_mouse_gl:
-			glColor4f(1, 0, 0, 1)
+			glColor4f(1, 0, 0, 0.5)
 			debuxar_linha([[pos_mouse_gl[0],pos_camara[1]],[pos_mouse_gl[0],ALTO_PANTALLA_GL+pos_camara[1]]])
 			debuxar_linha([[pos_camara[0],pos_mouse_gl[1]],[ANCHO_PANTALLA_GL+pos_camara[0],pos_mouse_gl[1]]])
+			debuxar_rect_gl(
+				[[int(pos_mouse_gl[0]/ANCHO_CADRO)*ANCHO_CADRO,int(pos_mouse_gl[1]/ALTO_CADRO)*ALTO_CADRO],
+				[int(pos_mouse_gl[0]/ANCHO_CADRO)*ANCHO_CADRO+ANCHO_CADRO,int(pos_mouse_gl[1]/ALTO_CADRO)*ALTO_CADRO],
+				[int(pos_mouse_gl[0]/ANCHO_CADRO)*ANCHO_CADRO+ANCHO_CADRO,int(pos_mouse_gl[1]/ALTO_CADRO)*ALTO_CADRO+ALTO_CADRO],
+				[int(pos_mouse_gl[0]/ANCHO_CADRO)*ANCHO_CADRO,int(pos_mouse_gl[1]/ALTO_CADRO)*ALTO_CADRO+ALTO_CADRO]])
 
 
 		#EVENTOS

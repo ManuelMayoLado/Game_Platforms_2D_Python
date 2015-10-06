@@ -20,7 +20,7 @@ FPS = 60
 
 RESOLUCION = [pygame.display.Info().current_w,pygame.display.Info().current_h]
 
-RESOLUCION = 1200,800
+RESOLUCION = 800,400
 
 ANCHO_VENTANA, ALTO_VENTANA = RESOLUCION
 
