@@ -11,18 +11,18 @@ import os
 import sys
 
 if os.name == 'nt' and sys.getwindowsversion()[0] >= 6:
-	ctypes.windll.user32.SetProcessDPIAware()
+    ctypes.windll.user32.SetProcessDPIAware()
 
 #VARIABLES
 
 camara_libre = False
 mostrar_cadricula = True
 
+_fase_cargada = False
+
 #FASES
 
 lista_fases = [fase(0,50,30,"mapa_colisions.txt")]
-
-fase_cargada = False
 
 num_fase = 0
 
@@ -48,239 +48,254 @@ _ON = True
 
 def main():
 
-	global _ON
-	global _fase_cargada
-	global camara_libre
-	global mostrar_cadricula
+    global _ON
+    global _fase_cargada
+    global camara_libre
+    global mostrar_cadricula
 
-	movemento_pj = []
+    #INICIAR OPENGL
 
-	init_gl()
+    init_gl()
 
-	#BUCLE XOGO
-	#-----------------
+    t_ID = texturas()
 
-	while _ON:
+    #BUCLE XOGO
+    #-----------------
 
-		reloj = pygame.time.Clock()
+    while _ON:
 
-		#### CARGA DE FASE ####
-		#######################
+        reloj = pygame.time.Clock()
 
-		if not fase_cargada:
+        #### CARGA DE FASE ####
+        #######################
 
-			fase_actual = lista_fases[num_fase]
+        if not _fase_cargada:
 
-			#VARIABLES
+            fase_actual = lista_fases[num_fase]
 
-			NUM_CADROS_ANCHO_FASE = fase_actual.cadros_ancho
-			NUM_CADROS_ALTO_FASE = fase_actual.cadros_alto
-			NUM_CADROS_TOTALES_FASE = NUM_CADROS_ANCHO_FASE * NUM_CADROS_ALTO_FASE
-			lista_cadros_colision = []
-			for i in range(NUM_CADROS_TOTALES_FASE):
-				lista_cadros_colision.append(0)
-			lista_cadros_colision = cargar_lista_cadros_colision(fase_actual.doc_col,lista_cadros_colision)
+            #VARIABLES
 
-			lista_vertices_cadros_colision = []
-			for i in range(len(lista_cadros_colision)):
-				if lista_cadros_colision[i]:
-					pos_cadro = pos(i,NUM_CADROS_ANCHO_FASE)
-					lista_vertices_cadros_colision.append(
-						[pos_cadro[0]*ANCHO_CADRO,pos_cadro[1]*ALTO_CADRO])
-					lista_vertices_cadros_colision.append(
-						[pos_cadro[0]*ANCHO_CADRO+ANCHO_CADRO,pos_cadro[1]*ALTO_CADRO])
-					lista_vertices_cadros_colision.append(
-						[pos_cadro[0]*ANCHO_CADRO+ANCHO_CADRO,pos_cadro[1]*ALTO_CADRO+ALTO_CADRO])
-					lista_vertices_cadros_colision.append(
-						[pos_cadro[0]*ANCHO_CADRO,pos_cadro[1]*ALTO_CADRO+ALTO_CADRO])
+            NUM_CADROS_ANCHO_FASE = fase_actual.cadros_ancho
+            NUM_CADROS_ALTO_FASE = fase_actual.cadros_alto
+            NUM_CADROS_TOTALES_FASE = NUM_CADROS_ANCHO_FASE * NUM_CADROS_ALTO_FASE
+            lista_cadros_colision = []
+            for i in range(NUM_CADROS_TOTALES_FASE):
+                lista_cadros_colision.append(0)
+            lista_cadros_colision = cargar_lista_cadros_colision(fase_actual.doc_col,lista_cadros_colision)
 
-			ANCHO_FASE = fase_actual.ancho
-			ALTO_FASE = fase_actual.alto
+            lista_vertices_cadros_colision = []
+            for i in range(len(lista_cadros_colision)):
+                if lista_cadros_colision[i]:
+                    pos_cadro = pos(i,NUM_CADROS_ANCHO_FASE)
+                    lista_vertices_cadros_colision.append(
+                        [pos_cadro[0]*ANCHO_CADRO,pos_cadro[1]*ALTO_CADRO])
+                    lista_vertices_cadros_colision.append(
+                        [pos_cadro[0]*ANCHO_CADRO+ANCHO_CADRO,pos_cadro[1]*ALTO_CADRO])
+                    lista_vertices_cadros_colision.append(
+                        [pos_cadro[0]*ANCHO_CADRO+ANCHO_CADRO,pos_cadro[1]*ALTO_CADRO+ALTO_CADRO])
+                    lista_vertices_cadros_colision.append(
+                        [pos_cadro[0]*ANCHO_CADRO,pos_cadro[1]*ALTO_CADRO+ALTO_CADRO])
 
-			vertices_cadricula = []
+            ANCHO_FASE = fase_actual.ancho
+            ALTO_FASE = fase_actual.alto
 
-			for i in range(NUM_CADROS_ANCHO_FASE+1):
-				vertices_cadricula.append([i*ANCHO_CADRO,0])
-				vertices_cadricula.append([i*ANCHO_CADRO,ALTO_FASE])
+            vertices_cadricula = []
 
-			for i in range(NUM_CADROS_ALTO_FASE+1):
-				vertices_cadricula.append([0,i*ALTO_CADRO])
-				vertices_cadricula.append([ANCHO_FASE,i*ALTO_CADRO])
+            for i in range(NUM_CADROS_ANCHO_FASE+1):
+                vertices_cadricula.append([i*ANCHO_CADRO,0])
+                vertices_cadricula.append([i*ANCHO_CADRO,ALTO_FASE])
 
-			#LISTAS DE OPENGL
+            for i in range(NUM_CADROS_ALTO_FASE+1):
+                vertices_cadricula.append([0,i*ALTO_CADRO])
+                vertices_cadricula.append([ANCHO_FASE,i*ALTO_CADRO])
 
-			#CADROS_COLISION
+            #LISTAS DE OPENGL
 
-			LISTA_CADROS_COLISION = glGenLists(2)
-			glNewList(LISTA_CADROS_COLISION, GL_COMPILE) ### INICIO LISTA
-			glLoadIdentity()
-			glBegin(GL_QUADS)
-			glColor4f(1,0.3,0.3,1)
-			for v in lista_vertices_cadros_colision:
-				glVertex2f(v[0],v[1])
-			glEnd()
-			glEndList() ############################### FIN LISTA
+            #CADROS_COLISION
 
-			#CADRICULA
+            LISTA_CADROS_COLISION = glGenLists(2)
+            glNewList(LISTA_CADROS_COLISION, GL_COMPILE) ### INICIO LISTA
+            glLoadIdentity()
+            glBindTexture(GL_TEXTURE_2D, t_ID)
+            glBegin(GL_QUADS)
+            #glColor4f(1,0.3,0.3,1)
+            vert_text = [0,0]
+            for v in lista_vertices_cadros_colision:
+                glTexCoord2f(*vert_text)
+                if vert_text == [0,0]:
+                    vert_text = [1,0]
+                elif vert_text == [1,0]:
+                    vert_text = [1,1]
+                elif vert_text == [1,1]:
+                    vert_text = [0,1]
+                elif vert_text == [0,1]:
+                    vert_text = [0,0]
+                glVertex2f(v[0],v[1])
+            glEnd()
+            glEndList() ############################### FIN LISTA
 
-			LISTA_CADRICULA = glGenLists(1)
-			glNewList(LISTA_CADRICULA, GL_COMPILE) ### INICIO LISTA
-			glLoadIdentity()
-			glBegin(GL_LINES)
-			glColor4f(0.5, 0.5, 0.5, 0.5)
-			for v in vertices_cadricula:
-				glVertex2f(v[0],v[1])
-			glEnd()
-			glEndList()	############################### FIN LISTA
+            #CADRICULA
 
-			_fase_cargada = True
+            LISTA_CADRICULA = glGenLists(1)
+            glNewList(LISTA_CADRICULA, GL_COMPILE) ### INICIO LISTA
+            glLoadIdentity()
+            glBegin(GL_LINES)
+            glColor4f(0.5, 0.5, 0.5, 0.5)
+            for v in vertices_cadricula:
+                glVertex2f(v[0],v[1])
+            glEnd()
+            glEndList()	############################### FIN LISTA
 
-		#######################
-		#######################
+            _fase_cargada = True
 
-		#LIMPIAR VENTANA
+        #######################
+        #######################
 
-		limpiar_ventana_gl()
+        #LIMPIAR VENTANA
 
-		glColor4f(1, 1, 1, 1)
-		debuxar_rect_gl(
-			[(pos_camara[0],pos_camara[1]),
-			(ANCHO_VENTANA+pos_camara[0],pos_camara[1]),
-			(ANCHO_VENTANA+pos_camara[0],ALTO_VENTANA+pos_camara[1]),
-			(pos_camara[0],ALTO_VENTANA+pos_camara[1])]
-		)
+        limpiar_ventana_gl()
 
-		############################################
-		#DEBUXADO
-		############################################
+        glBindTexture(GL_TEXTURE_2D, 0)
 
-		#CADROS_COLISION
+        glColor4f(1, 1, 1, 1)
+        debuxar_rect_gl(
+            [(pos_camara[0],pos_camara[1]),
+            (ANCHO_VENTANA+pos_camara[0],pos_camara[1]),
+            (ANCHO_VENTANA+pos_camara[0],ALTO_VENTANA+pos_camara[1]),
+            (pos_camara[0],ALTO_VENTANA+pos_camara[1])]
+        )
 
-		glCallList(LISTA_CADROS_COLISION)
+        ############################################
+        #DEBUXADO
+        ############################################
 
-		#DEBUXAR PJ
+        #CADROS_COLISION
 
-		glColor4f(0, 0, 0.8, 1)
-		debuxar_rect_gl(
-			[(pj.pos[0],pj.pos[1]),
-			(pj.pos[0]+ANCHO_CADRO,pj.pos[1]),
-			(pj.pos[0]+ANCHO_CADRO,pj.pos[1]+ALTO_CADRO*2),
-			(pj.pos[0],pj.pos[1]+ALTO_CADRO*2)]
-		)
+        glCallList(LISTA_CADROS_COLISION)
 
-		#CADRICULA
+        #DEBUXAR PJ
 
-		if mostrar_cadricula:
-			glCallList(LISTA_CADRICULA)
+        glColor4f(0, 0, 0.8, 1)
+        debuxar_rect_gl(
+            [(pj.pos[0],pj.pos[1]),
+            (pj.pos[0]+ANCHO_CADRO,pj.pos[1]),
+            (pj.pos[0]+ANCHO_CADRO,pj.pos[1]+ALTO_CADRO*2),
+            (pj.pos[0],pj.pos[1]+ALTO_CADRO*2)]
+        )
 
-		###########################################
-		#FISICA
-		###########################################
+        #CADRICULA
 
-		#pj.fisica.vel[1] -= pj.fisica.gravedad
+        if mostrar_cadricula:
+            glCallList(LISTA_CADRICULA)
 
-		for impulso in pj.fisica.impulsos:
-			pj.fisica.vel[0] += impulso[0]
-			pj.fisica.vel[1] += impulso[1]
+        ###########################################
+        #FISICA
+        ###########################################
 
-		pj.pos = pj.pos[0]+pj.fisica.vel[0],pj.pos[1]+pj.fisica.vel[1]
+        #pj.fisica.vel[1] -= pj.fisica.gravedad
 
-		#CAMARA
+        for impulso in pj.fisica.impulsos:
+            pj.fisica.vel[0] += impulso[0]
+            pj.fisica.vel[1] += impulso[1]
 
-		if camara_libre:
-			if tecla_pulsada[K_RIGHT]:
-				pos_camara[0] += 1
-			if tecla_pulsada[K_LEFT]:
-				pos_camara[0] -= 1
-			if tecla_pulsada[K_UP]:
-				pos_camara[1] += 1
-			if tecla_pulsada[K_DOWN]:
-				pos_camara[1] -= 1
-		else:
-			pos_camara[0] = pj.pos[0]-(ANCHO_PANTALLA_GL/2-ANCHO_CADRO/2)
-			pos_camara[1] = pj.pos[1]-(ALTO_PANTALLA_GL/2-ALTO_CADRO)
+        pj.pos = pj.pos[0]+pj.fisica.vel[0],pj.pos[1]+pj.fisica.vel[1]
 
-			pos_camara[0] = max(pos_camara[0], 0)
-			pos_camara[0] = min(pos_camara[0], ANCHO_FASE-ANCHO_PANTALLA_GL)
+        #CAMARA
 
-			pos_camara[1] = max(pos_camara[1], 0)
-			pos_camara[1] = min(pos_camara[1], ALTO_FASE-ALTO_PANTALLA_GL)
+        if camara_libre:
+            if tecla_pulsada[K_RIGHT]:
+                pos_camara[0] += 1
+            if tecla_pulsada[K_LEFT]:
+                pos_camara[0] -= 1
+            if tecla_pulsada[K_UP]:
+                pos_camara[1] += 1
+            if tecla_pulsada[K_DOWN]:
+                pos_camara[1] -= 1
+        else:
+            pos_camara[0] = pj.pos[0]-(ANCHO_PANTALLA_GL/2-ANCHO_CADRO/2)
+            pos_camara[1] = pj.pos[1]-(ALTO_PANTALLA_GL/2-ALTO_CADRO)
 
-		############################################
-		#EVENTOS
-		############################################
+            pos_camara[0] = max(pos_camara[0], 0)
+            pos_camara[0] = min(pos_camara[0], ANCHO_FASE-ANCHO_PANTALLA_GL)
 
-		###### TECLAS PULSADAS ######
+            pos_camara[1] = max(pos_camara[1], 0)
+            pos_camara[1] = min(pos_camara[1], ALTO_FASE-ALTO_PANTALLA_GL)
 
-		tecla_pulsada = pygame.key.get_pressed()
+        ############################################
+        #EVENTOS
+        ############################################
 
-		if tecla_pulsada[K_d]:
-			pj.fisica.vel[0] = 1
+        ###### TECLAS PULSADAS ######
 
-		if tecla_pulsada[K_a]:
-			pj.fisica.vel[0] = -1
+        tecla_pulsada = pygame.key.get_pressed()
 
-		if tecla_pulsada[K_d] and tecla_pulsada[K_a] or not(tecla_pulsada[K_d] or tecla_pulsada[K_a]):
-			pj.fisica.vel[0] = 0
+        if tecla_pulsada[K_d]:
+            pj.fisica.vel[0] = 1
 
-		####### MOUSE ########
+        if tecla_pulsada[K_a]:
+            pj.fisica.vel[0] = -1
 
-		pos_mouse = pygame.mouse.get_pos()
+        if tecla_pulsada[K_d] and tecla_pulsada[K_a] or not(tecla_pulsada[K_d] or tecla_pulsada[K_a]):
+            pj.fisica.vel[0] = 0
 
-		if pos_mouse[0] >= MARCO_LATERAL/2 and pos_mouse[0] <= ANCHO_VENTANA-MARCO_LATERAL/2:
-			pos_mouse_gl = [(pos_mouse[0]-MARCO_LATERAL/2)*ANCHO_PANTALLA_GL/(ANCHO_VENTANA-MARCO_LATERAL)+pos_camara[0],
-						ALTO_PANTALLA_GL-(pos_mouse[1]*ALTO_PANTALLA_GL/ALTO_VENTANA)+pos_camara[1]]
-		else:
-			pos_mouse_gl = False
+        ####### MOUSE ########
 
+        pos_mouse = pygame.mouse.get_pos()
 
-		if pos_mouse_gl:
-			glColor4f(1, 0, 0, 0.5)
-			debuxar_linha([[pos_mouse_gl[0],pos_camara[1]],[pos_mouse_gl[0],ALTO_PANTALLA_GL+pos_camara[1]]])
-			debuxar_linha([[pos_camara[0],pos_mouse_gl[1]],[ANCHO_PANTALLA_GL+pos_camara[0],pos_mouse_gl[1]]])
-			debuxar_rect_gl(
-				[[int(pos_mouse_gl[0]/ANCHO_CADRO)*ANCHO_CADRO,int(pos_mouse_gl[1]/ALTO_CADRO)*ALTO_CADRO],
-				[int(pos_mouse_gl[0]/ANCHO_CADRO)*ANCHO_CADRO+ANCHO_CADRO,int(pos_mouse_gl[1]/ALTO_CADRO)*ALTO_CADRO],
-				[int(pos_mouse_gl[0]/ANCHO_CADRO)*ANCHO_CADRO+ANCHO_CADRO,int(pos_mouse_gl[1]/ALTO_CADRO)*ALTO_CADRO+ALTO_CADRO],
-				[int(pos_mouse_gl[0]/ANCHO_CADRO)*ANCHO_CADRO,int(pos_mouse_gl[1]/ALTO_CADRO)*ALTO_CADRO+ALTO_CADRO]])
+        if pos_mouse[0] >= MARCO_LATERAL/2 and pos_mouse[0] <= ANCHO_VENTANA-MARCO_LATERAL/2:
+            pos_mouse_gl = [(pos_mouse[0]-MARCO_LATERAL/2)*ANCHO_PANTALLA_GL/(ANCHO_VENTANA-MARCO_LATERAL)+pos_camara[0],
+                        ALTO_PANTALLA_GL-(pos_mouse[1]*ALTO_PANTALLA_GL/ALTO_VENTANA)+pos_camara[1]]
+        else:
+            pos_mouse_gl = False
 
 
-		#EVENTOS
+        if pos_mouse_gl:
+            glColor4f(1, 0, 0, 0.5)
+            debuxar_linha([[pos_mouse_gl[0],pos_camara[1]],[pos_mouse_gl[0],ALTO_PANTALLA_GL+pos_camara[1]]])
+            debuxar_linha([[pos_camara[0],pos_mouse_gl[1]],[ANCHO_PANTALLA_GL+pos_camara[0],pos_mouse_gl[1]]])
+            debuxar_rect_gl(
+                [[int(pos_mouse_gl[0]/ANCHO_CADRO)*ANCHO_CADRO,int(pos_mouse_gl[1]/ALTO_CADRO)*ALTO_CADRO],
+                [int(pos_mouse_gl[0]/ANCHO_CADRO)*ANCHO_CADRO+ANCHO_CADRO,int(pos_mouse_gl[1]/ALTO_CADRO)*ALTO_CADRO],
+                [int(pos_mouse_gl[0]/ANCHO_CADRO)*ANCHO_CADRO+ANCHO_CADRO,int(pos_mouse_gl[1]/ALTO_CADRO)*ALTO_CADRO+ALTO_CADRO],
+                [int(pos_mouse_gl[0]/ANCHO_CADRO)*ANCHO_CADRO,int(pos_mouse_gl[1]/ALTO_CADRO)*ALTO_CADRO+ALTO_CADRO]])
 
-		for evento in pygame.event.get():
 
-			#TECLADO
-			if evento.type == pygame.KEYDOWN:
+        #EVENTOS
 
-				#CAMARA_LIBRE
-				if evento.key == K_c:
-					if camara_libre:
-						camara_libre=False
-					else:
-						camara_libre=True
+        for evento in pygame.event.get():
 
-				#MOSTRAR_CADRICULA
-				if evento.key == K_v:
-					if mostrar_cadricula:
-						mostrar_cadricula = False
-					else:
-						mostrar_cadricula = True
+            #TECLADO
+            if evento.type == pygame.KEYDOWN:
 
-				#ESC - CERRAR  XOGO
-				if evento.key == K_ESCAPE:
-					_ON = False
+                #CAMARA_LIBRE
+                if evento.key == K_c:
+                    if camara_libre:
+                        camara_libre=False
+                    else:
+                        camara_libre=True
 
-			#QUIT
-			if evento.type == pygame.QUIT:
-				_ON = False
+                #MOSTRAR_CADRICULA
+                if evento.key == K_v:
+                    if mostrar_cadricula:
+                        mostrar_cadricula = False
+                    else:
+                        mostrar_cadricula = True
 
-		if not _ON:
-			pygame.display.quit()
-			break
+                #ESC - CERRAR  XOGO
+                if evento.key == K_ESCAPE:
+                    _ON = False
 
-		pygame.display.flip()
+            #QUIT
+            if evento.type == pygame.QUIT:
+                _ON = False
 
-		reloj.tick(FPS)
+        if not _ON:
+            pygame.display.quit()
+            break
+
+        pygame.display.flip()
+
+        reloj.tick(FPS)
 
 if __name__ == '__main__':
-	main()
+    main()

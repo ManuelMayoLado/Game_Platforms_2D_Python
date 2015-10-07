@@ -26,6 +26,7 @@ def cargar_lista_cadros_colision(archivo,lista):
 def init_gl():
     glViewport(MARCO_LATERAL/2,0,ANCHO_VENTANA-MARCO_LATERAL,ALTO_VENTANA)
     glClearColor(0,0,0,0)
+    glEnable(GL_TEXTURE_2D)
     glEnable(GL_BLEND)
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
     #glEnable(GL_LINE_SMOOTH)
@@ -54,3 +55,14 @@ def debuxar_linha(vertices):
     for i in vertices:
         glVertex2f(i[0],i[1])
     glEnd()
+
+def texturas():
+    texturaSurface = pygame.image.load("textura-02.png").convert_alpha()
+    texturaData = pygame.image.tostring(texturaSurface, "RGBA", True)
+    textID = glGenTextures(1)
+    glBindTexture(GL_TEXTURE_2D,textID)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texturaSurface.get_width(), texturaSurface.get_height(), 0,
+                            GL_RGBA, GL_UNSIGNED_BYTE, texturaData)
+    return textID
