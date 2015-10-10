@@ -56,10 +56,10 @@ def debuxar_linha(vertices):
         glVertex2f(i[0],i[1])
     glEnd()
 
-def texturas():
-    texturaSurface = pygame.image.load("textura-02.png").convert_alpha()
+def cargar_imagen_textura(id,imagen):
+    texturaSurface = pygame.image.load(imagen).convert_alpha()
     texturaData = pygame.image.tostring(texturaSurface, "RGBA", True)
-    textID = glGenTextures(1)
+    textID = glGenTextures(id)
     glBindTexture(GL_TEXTURE_2D,textID)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)

@@ -1,10 +1,14 @@
 # -*- coding: utf-8 -*-
 
+###LIBRERIAS NECESARIAS###
+#pygame
+#pyOpenGL
+
 from __future__ import division
 
-from constantes import *
-from clases import *
-from funcions import *
+from modulos.constantes import *
+from modulos.clases import *
+from modulos.funcions import *
 
 import ctypes
 import os
@@ -22,7 +26,7 @@ _fase_cargada = False
 
 #FASES
 
-lista_fases = [fase(0,50,30,"mapa_colisions.txt")]
+lista_fases = [fase(0,50,30,"mapas/mapa_colisions.txt")]
 
 num_fase = 0
 
@@ -57,7 +61,7 @@ def main():
 
     init_gl()
 
-    t_ID = texturas()
+    t_ID = cargar_imagen_textura(1,"texturas/textura-02.png")
 
     #BUCLE XOGO
     #-----------------
