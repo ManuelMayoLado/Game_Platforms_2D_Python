@@ -20,7 +20,7 @@ FPS = 60
 
 RESOLUCION = [pygame.display.Info().current_w,pygame.display.Info().current_h]
 
-RESOLUCION = 800,600
+RESOLUCION = 1000,600
 
 ANCHO_VENTANA, ALTO_VENTANA = RESOLUCION
 
@@ -44,4 +44,13 @@ ALTO_PANTALLA_GL = DIMENSIONS_GL
 
 COLOR_LIMPIADO = [1,1,1,1]
 
+#CAMBIARAN DESPOIS:
+
 pos_camara = [0,0]
+
+lista_cadros_colision = []
+lista_vertices_cadros_colision = []
+vertices_cadricula = []
+
+ANCHO_FASE = 0
+ALTO_FASE = 0

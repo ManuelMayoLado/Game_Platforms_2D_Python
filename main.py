@@ -26,13 +26,13 @@ _fase_cargada = False
 
 #FASES
 
-lista_fases = [fase(0,50,30,"mapas/mapa_colisions.txt")]
+lista_fases = [fase(0,50,35,"mapas/mapa_colisions.txt")]
 
 num_fase = 0
 
 #PERSONAJE
 
-pj = personaxe(0,[20,120],1,objeto_fisico([0,0],0.1,[]))
+pj = personaxe(0,[20,120],1,objeto_fisico([0,0],0.06,[]))
 
 #INICIAR PYGAME
 
@@ -52,6 +52,8 @@ _ON = True
 
 def main():
 
+    saltando = 10
+
     global _ON
     global _fase_cargada
     global camara_libre
@@ -61,7 +63,19 @@ def main():
 
     init_gl()
 
-    t_ID = cargar_imagen_textura(1,"texturas/textura-02.png")
+    #CARGAR TEXTURAS
+
+    #glBindTexture(GL_TEXTURE_2D,1)
+    #cargar_imagen_textura("texturas/textura-02.png")
+
+    #numero_texturas = 2
+
+    #lista_texturas = []
+
+    #for i in range(1,numero_texturas+1):
+    #    lista_texturas.append(GLuint(i))
+
+    #glGenTextures(numero_texturas,lista_texturas[0])
 
     #BUCLE XOGO
     #-----------------
@@ -79,76 +93,23 @@ def main():
 
             #VARIABLES
 
-            NUM_CADROS_ANCHO_FASE = fase_actual.cadros_ancho
-            NUM_CADROS_ALTO_FASE = fase_actual.cadros_alto
-            NUM_CADROS_TOTALES_FASE = NUM_CADROS_ANCHO_FASE * NUM_CADROS_ALTO_FASE
-            lista_cadros_colision = []
-            for i in range(NUM_CADROS_TOTALES_FASE):
-                lista_cadros_colision.append(0)
-            lista_cadros_colision = cargar_lista_cadros_colision(fase_actual.doc_col,lista_cadros_colision)
+            cargar_fase(fase_actual)
 
-            lista_vertices_cadros_colision = []
-            for i in range(len(lista_cadros_colision)):
-                if lista_cadros_colision[i]:
-                    pos_cadro = pos(i,NUM_CADROS_ANCHO_FASE)
-                    lista_vertices_cadros_colision.append(
-                        [pos_cadro[0]*ANCHO_CADRO,pos_cadro[1]*ALTO_CADRO])
-                    lista_vertices_cadros_colision.append(
-                        [pos_cadro[0]*ANCHO_CADRO+ANCHO_CADRO,pos_cadro[1]*ALTO_CADRO])
-                    lista_vertices_cadros_colision.append(
-                        [pos_cadro[0]*ANCHO_CADRO+ANCHO_CADRO,pos_cadro[1]*ALTO_CADRO+ALTO_CADRO])
-                    lista_vertices_cadros_colision.append(
-                        [pos_cadro[0]*ANCHO_CADRO,pos_cadro[1]*ALTO_CADRO+ALTO_CADRO])
-
-            ANCHO_FASE = fase_actual.ancho
-            ALTO_FASE = fase_actual.alto
-
-            vertices_cadricula = []
-
-            for i in range(NUM_CADROS_ANCHO_FASE+1):
-                vertices_cadricula.append([i*ANCHO_CADRO,0])
-                vertices_cadricula.append([i*ANCHO_CADRO,ALTO_FASE])
-
-            for i in range(NUM_CADROS_ALTO_FASE+1):
-                vertices_cadricula.append([0,i*ALTO_CADRO])
-                vertices_cadricula.append([ANCHO_FASE,i*ALTO_CADRO])
+            (NUM_CADROS_ANCHO_FASE,NUM_CADROS_ALTO_FASE,NUM_CADROS_TOTALES_FASE,lista_cadros_colision,
+             ANCHO_FASE,ALTO_FASE,lista_vertices_cadros_colision,vertices_cadricula) = cargar_fase(fase_actual)
 
             #LISTAS DE OPENGL
 
-            #CADROS_COLISION
+                #CADROS_COLISION
 
-            LISTA_CADROS_COLISION = glGenLists(2)
-            glNewList(LISTA_CADROS_COLISION, GL_COMPILE) ### INICIO LISTA
-            glLoadIdentity()
-            glBindTexture(GL_TEXTURE_2D, t_ID)
-            glBegin(GL_QUADS)
-            #glColor4f(1,0.3,0.3,1)
-            vert_text = [0,0]
-            for v in lista_vertices_cadros_colision:
-                glTexCoord2f(*vert_text)
-                if vert_text == [0,0]:
-                    vert_text = [1,0]
-                elif vert_text == [1,0]:
-                    vert_text = [1,1]
-                elif vert_text == [1,1]:
-                    vert_text = [0,1]
-                elif vert_text == [0,1]:
-                    vert_text = [0,0]
-                glVertex2f(v[0],v[1])
-            glEnd()
-            glEndList() ############################### FIN LISTA
+            ID_LISTA_CADROS_COLISION = glGenLists(2)
+            crear_lista(ID_LISTA_CADROS_COLISION,lista_vertices_cadros_colision,"rectangulo")
 
-            #CADRICULA
+                #CADRICULA
 
-            LISTA_CADRICULA = glGenLists(1)
-            glNewList(LISTA_CADRICULA, GL_COMPILE) ### INICIO LISTA
-            glLoadIdentity()
-            glBegin(GL_LINES)
-            glColor4f(0.5, 0.5, 0.5, 0.5)
-            for v in vertices_cadricula:
-                glVertex2f(v[0],v[1])
-            glEnd()
-            glEndList()	############################### FIN LISTA
+            ID_LISTA_CADRICULA = glGenLists(1)
+            glBindTexture(GL_TEXTURE_2D, 1)
+            crear_lista(ID_LISTA_CADRICULA,vertices_cadricula,"liña")
 
             _fase_cargada = True
 
@@ -159,48 +120,83 @@ def main():
 
         limpiar_ventana_gl()
 
-        glBindTexture(GL_TEXTURE_2D, 0)
-
-        glColor4f(1, 1, 1, 1)
-        debuxar_rect_gl(
-            [(pos_camara[0],pos_camara[1]),
-            (ANCHO_VENTANA+pos_camara[0],pos_camara[1]),
-            (ANCHO_VENTANA+pos_camara[0],ALTO_VENTANA+pos_camara[1]),
-            (pos_camara[0],ALTO_VENTANA+pos_camara[1])]
-        )
-
         ############################################
         #DEBUXADO
         ############################################
 
+        #DEBUXAR FONDO
+
+        glColor4f(1, 1, 1, 1)
+        glLoadIdentity()
+        glBegin(GL_QUADS)
+        glVertex2f(pos_camara[0],pos_camara[1])
+        glVertex2f(ANCHO_PANTALLA_GL+pos_camara[0],pos_camara[1])
+        glVertex2f(ANCHO_PANTALLA_GL+pos_camara[0],ALTO_PANTALLA_GL+pos_camara[1])
+        glVertex2f(pos_camara[0],ALTO_PANTALLA_GL+pos_camara[1])
+        glEnd()
+
+        glColor4f(0.8,0.8,0.8,0.5)
+        glLoadIdentity()
+        glBegin(GL_QUADS)
+        glVertex2f(0,0)
+        glVertex2f(ANCHO_FASE,0)
+        glVertex2f(ANCHO_FASE,ALTO_FASE)
+        glVertex2f(0,ALTO_FASE)
+        glEnd()
+
         #CADROS_COLISION
 
-        glCallList(LISTA_CADROS_COLISION)
+        glColor4f(0.4,0.7,0.2,0.7)
+
+        glCallList(ID_LISTA_CADROS_COLISION)
+
+        #glBindTexture(GL_TEXTURE_2D,False)
 
         #DEBUXAR PJ
 
         glColor4f(0, 0, 0.8, 1)
         debuxar_rect_gl(
             [(pj.pos[0],pj.pos[1]),
-            (pj.pos[0]+ANCHO_CADRO,pj.pos[1]),
-            (pj.pos[0]+ANCHO_CADRO,pj.pos[1]+ALTO_CADRO*2),
-            (pj.pos[0],pj.pos[1]+ALTO_CADRO*2)]
+             (pj.pos[0]+ANCHO_CADRO,pj.pos[1]),
+             (pj.pos[0]+ANCHO_CADRO,pj.pos[1]+ALTO_CADRO*2),
+             (pj.pos[0],pj.pos[1]+ALTO_CADRO*2)]
         )
 
         #CADRICULA
 
+        glColor4f(0.5, 0.5, 0.5, 0.5)
+
         if mostrar_cadricula:
-            glCallList(LISTA_CADRICULA)
+            glCallList(ID_LISTA_CADRICULA)
 
         ###########################################
         #FISICA
         ###########################################
 
-        #pj.fisica.vel[1] -= pj.fisica.gravedad
+        l_cadros_inferiores = cadros_inferiores(pj,lista_cadros_colision,NUM_CADROS_ANCHO_FASE)
+        distancia = distancia_sujeto_cadro(pj,l_cadros_inferiores)
+
+        glColor4f(1,0,0,0.5)
+        for i in l_cadros_inferiores:
+            debuxar_rect_2(i[0]*ANCHO_CADRO,i[1]*ALTO_CADRO,i[2],i[3])
+
+        if distancia <= 0 and pj.fisica.vel[1] < 0:
+            pj.fisica.vel[1] = 0
+            if abs(distancia) < ALTO_CADRO:
+                pj.pos = [pj.pos[0],pj.pos[1]-distancia]
+            pj_en_suelo = True
+        else:
+            pj.fisica.vel[1] -= pj.fisica.gravedad
+            pj_en_suelo = False
 
         for impulso in pj.fisica.impulsos:
             pj.fisica.vel[0] += impulso[0]
             pj.fisica.vel[1] += impulso[1]
+            impulso[2] -= 1
+
+        for impulso in pj.fisica.impulsos:
+            if impulso[2] <= 0:
+                pj.fisica.impulsos.remove(impulso)
 
         pj.pos = pj.pos[0]+pj.fisica.vel[0],pj.pos[1]+pj.fisica.vel[1]
 
@@ -225,6 +221,7 @@ def main():
             pos_camara[1] = max(pos_camara[1], 0)
             pos_camara[1] = min(pos_camara[1], ALTO_FASE-ALTO_PANTALLA_GL)
 
+
         ############################################
         #EVENTOS
         ############################################
@@ -242,6 +239,13 @@ def main():
         if tecla_pulsada[K_d] and tecla_pulsada[K_a] or not(tecla_pulsada[K_d] or tecla_pulsada[K_a]):
             pj.fisica.vel[0] = 0
 
+        if tecla_pulsada[K_w] and pj_en_suelo and not saltando:
+            saltando = 10
+            if len(pj.fisica.impulsos) == 0:
+                pj.fisica.impulsos.append([0,0.4,5])
+
+        saltando = max(0,saltando-1)
+
         ####### MOUSE ########
 
         pos_mouse = pygame.mouse.get_pos()
@@ -254,9 +258,13 @@ def main():
 
 
         if pos_mouse_gl:
-            glColor4f(1, 0, 0, 0.5)
+            glColor4f(1, 0, 0, 0.4)
             debuxar_linha([[pos_mouse_gl[0],pos_camara[1]],[pos_mouse_gl[0],ALTO_PANTALLA_GL+pos_camara[1]]])
             debuxar_linha([[pos_camara[0],pos_mouse_gl[1]],[ANCHO_PANTALLA_GL+pos_camara[0],pos_mouse_gl[1]]])
+            if pos_mouse_gl[0] < 0:
+                pos_mouse_gl[0]-= ANCHO_CADRO
+            if pos_mouse_gl[1] < 0:
+                pos_mouse_gl[1] -= ALTO_CADRO
             debuxar_rect_gl(
                 [[int(pos_mouse_gl[0]/ANCHO_CADRO)*ANCHO_CADRO,int(pos_mouse_gl[1]/ALTO_CADRO)*ALTO_CADRO],
                 [int(pos_mouse_gl[0]/ANCHO_CADRO)*ANCHO_CADRO+ANCHO_CADRO,int(pos_mouse_gl[1]/ALTO_CADRO)*ALTO_CADRO],

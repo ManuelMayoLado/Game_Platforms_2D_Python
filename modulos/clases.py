@@ -8,6 +8,7 @@ class fase:
         self.cadros_ancho = cadros_ancho
         self.cadros_alto = cadros_alto
         self.doc_col = doc_col
+        self.num_cadros = cadros_ancho * cadros_alto
         self.ancho = cadros_ancho * ANCHO_CADRO
         self.alto = cadros_alto * ALTO_CADRO
 
