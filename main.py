@@ -65,17 +65,16 @@ def main():
 
     #CARGAR TEXTURAS
 
-    #glBindTexture(GL_TEXTURE_2D,1)
-    #cargar_imagen_textura("texturas/textura-02.png")
+    glGenTextures(2,[1,2])
 
-    #numero_texturas = 2
+    glBindTexture(GL_TEXTURE_2D,1)
+    cargar_imagen_textura("texturas/textura-02.png")
 
-    #lista_texturas = []
+    glBindTexture(GL_TEXTURE_2D,2)
+    cargar_imagen_textura("texturas/ceo-01.png")
 
-    #for i in range(1,numero_texturas+1):
-    #    lista_texturas.append(GLuint(i))
+    #glDeleteTextures([1,2])
 
-    #glGenTextures(numero_texturas,lista_texturas[0])
 
     #BUCLE XOGO
     #-----------------
@@ -120,6 +119,8 @@ def main():
 
         limpiar_ventana_gl()
 
+        glBindTexture(GL_TEXTURE_2D,0)
+
         ############################################
         #DEBUXADO
         ############################################
@@ -137,24 +138,32 @@ def main():
 
         glColor4f(0.8,0.8,0.8,0.5)
         glLoadIdentity()
+        glBindTexture(GL_TEXTURE_2D,2)
         glBegin(GL_QUADS)
+        glTexCoord2f(0,0)
         glVertex2f(0,0)
+        glTexCoord2f(1,0)
         glVertex2f(ANCHO_FASE,0)
+        glTexCoord2f(1,1)
         glVertex2f(ANCHO_FASE,ALTO_FASE)
+        glTexCoord2f(0,1)
         glVertex2f(0,ALTO_FASE)
         glEnd()
 
         #CADROS_COLISION
 
-        glColor4f(0.4,0.7,0.2,0.7)
-
+        glColor4f(0.8,0.8,0.8,1)
+        glBindTexture(GL_TEXTURE_2D,1)
         glCallList(ID_LISTA_CADROS_COLISION)
+
+        #QUITAR TEXTURAS
+        glBindTexture(GL_TEXTURE_2D,0)
 
         #glBindTexture(GL_TEXTURE_2D,False)
 
         #DEBUXAR PJ
 
-        glColor4f(0, 0, 0.8, 1)
+        glColor4f(0, 0.9, 0.3, 1)
         debuxar_rect_gl(
             [(pj.pos[0],pj.pos[1]),
              (pj.pos[0]+ANCHO_CADRO,pj.pos[1]),
@@ -180,9 +189,9 @@ def main():
         for i in l_cadros_inferiores:
             debuxar_rect_2(i[0]*ANCHO_CADRO,i[1]*ALTO_CADRO,i[2],i[3])
 
-        if distancia <= 0 and pj.fisica.vel[1] < 0:
+        if distancia <= 0 and pj.fisica.vel[1] <= 0:
             pj.fisica.vel[1] = 0
-            if abs(distancia) < ALTO_CADRO:
+            if abs(distancia) < ALTO_CADRO and abs(distancia) > 1:
                 pj.pos = [pj.pos[0],pj.pos[1]-distancia]
             pj_en_suelo = True
         else:

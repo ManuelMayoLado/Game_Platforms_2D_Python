@@ -59,10 +59,10 @@ def cadros_inferiores(sujeto,lista,cadrados_ancho):
     pos_cadro_sujeto = int(sujeto.pos[0]/ANCHO_CADRO), int(sujeto.pos[1]/ALTO_CADRO)
     num_cadro_sujeto = num(pos_cadro_sujeto,cadrados_ancho)
     num_a_mirar = [num_cadro_sujeto,num_cadro_sujeto-cadrados_ancho]
-    if sujeto.pos < pos_cadro_sujeto[0]*ANCHO_CADRO:
+    if not pos_cadro_sujeto[0] <= 0 and sujeto.pos < pos_cadro_sujeto[0]*ANCHO_CADRO:
         num_a_mirar.append(num_cadro_sujeto-1)
         num_a_mirar.append(num_cadro_sujeto-cadrados_ancho-1)
-    if sujeto.pos > pos_cadro_sujeto[0]*ANCHO_CADRO:
+    if not pos_cadro_sujeto[0] >= cadrados_ancho-1 and sujeto.pos > pos_cadro_sujeto[0]*ANCHO_CADRO:
         num_a_mirar.append(num_cadro_sujeto+1)
         num_a_mirar.append(num_cadro_sujeto-cadrados_ancho+1)
     lista_cadros = []
