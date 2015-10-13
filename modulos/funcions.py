@@ -55,23 +55,26 @@ def cargar_fase(fase):
 
 #### COLISIÓNS ####
 
-def cadros_inferiores(sujeto,lista,cadrados_ancho):
-	pos_cadro_sujeto = int(sujeto.pos[0]/ANCHO_CADRO), int(sujeto.pos[1]/ALTO_CADRO)
-	num_cadro_sujeto = num(pos_cadro_sujeto,cadrados_ancho)
-	num_a_mirar = [num_cadro_sujeto,num_cadro_sujeto-cadrados_ancho]
-	if not pos_cadro_sujeto[0] <= 0 and sujeto.pos < pos_cadro_sujeto[0]*ANCHO_CADRO:
-		num_a_mirar.append(num_cadro_sujeto-1)
-		num_a_mirar.append(num_cadro_sujeto-cadrados_ancho-1)
-	if not pos_cadro_sujeto[0] >= cadrados_ancho-1 and sujeto.pos > pos_cadro_sujeto[0]*ANCHO_CADRO:
-		num_a_mirar.append(num_cadro_sujeto+1)
-		num_a_mirar.append(num_cadro_sujeto-cadrados_ancho+1)
+def cadros_inferiores(sujeto,lista,cadrados_ancho,ancho_fase,alto_fase):
 	lista_cadros = []
-	for n in num_a_mirar:
-		try:
-			if lista[n]:
-				lista_cadros.append([pos(n,cadrados_ancho)[0],pos(n,cadrados_ancho)[1],ANCHO_CADRO,ALTO_CADRO])
-		except:
-			None
+	if (sujeto.pos[0] > -ANCHO_CADRO and sujeto.pos[0] < ancho_fase+ANCHO_CADRO
+		or
+		sujeto.pos[1] > -ALTO_CADRO and sujeto.pos[1] < alto_fase+ALTO_CADRO):
+		pos_cadro_sujeto = int(sujeto.pos[0]/ANCHO_CADRO), int(sujeto.pos[1]/ALTO_CADRO)
+		num_cadro_sujeto = num(pos_cadro_sujeto,cadrados_ancho)
+		num_a_mirar = [num_cadro_sujeto,num_cadro_sujeto-cadrados_ancho]
+		if sujeto.pos < pos_cadro_sujeto[0]*ANCHO_CADRO:
+			num_a_mirar.append(num_cadro_sujeto-1)
+			num_a_mirar.append(num_cadro_sujeto-cadrados_ancho-1)
+		if sujeto.pos > pos_cadro_sujeto[0]*ANCHO_CADRO:
+			num_a_mirar.append(num_cadro_sujeto+1)
+			num_a_mirar.append(num_cadro_sujeto-cadrados_ancho+1)
+		for n in num_a_mirar:
+			try:
+				if lista[n]:
+					lista_cadros.append([pos(n,cadrados_ancho)[0],pos(n,cadrados_ancho)[1],ANCHO_CADRO,ALTO_CADRO])
+			except:
+				None
 
 	return lista_cadros
 
