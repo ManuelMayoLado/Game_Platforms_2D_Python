@@ -216,10 +216,10 @@ def main():
         tecla_pulsada = pygame.key.get_pressed()
 
         if tecla_pulsada[K_d]:
-            pj.fisica.vel[0] = 1
+            pj.fisica.vel[0] = 0.5
 
         if tecla_pulsada[K_a]:
-            pj.fisica.vel[0] = -1
+            pj.fisica.vel[0] = -0.5
 
         if tecla_pulsada[K_d] and tecla_pulsada[K_a] or not(tecla_pulsada[K_d] or tecla_pulsada[K_a]):
             pj.fisica.vel[0] = 0
@@ -227,27 +227,6 @@ def main():
         if tecla_pulsada[K_w] and pj_en_suelo:
             if len(pj.fisica.impulsos) == 0:
                 pj.fisica.impulsos.append([0,0.4,5])
-
-                #CAMARA
-
-        if camara_libre:
-            if tecla_pulsada[K_RIGHT]:
-                pos_camara[0] += 1
-            if tecla_pulsada[K_LEFT]:
-                pos_camara[0] -= 1
-            if tecla_pulsada[K_UP]:
-                pos_camara[1] += 1
-            if tecla_pulsada[K_DOWN]:
-                pos_camara[1] -= 1
-        else:
-            pos_camara[0] = pj.pos[0]-(ANCHO_PANTALLA_GL/2-ANCHO_CADRO/2)
-            pos_camara[1] = pj.pos[1]-(ALTO_PANTALLA_GL/2-ALTO_CADRO)
-
-            pos_camara[0] = max(pos_camara[0], 0)
-            pos_camara[0] = min(pos_camara[0], ANCHO_FASE-ANCHO_PANTALLA_GL)
-
-            pos_camara[1] = max(pos_camara[1], 0)
-            pos_camara[1] = min(pos_camara[1], ALTO_FASE-ALTO_PANTALLA_GL)
 
 
         ####### MOUSE ########
@@ -322,6 +301,27 @@ def main():
         if not _ON:
             pygame.display.quit()
             break
+
+        #CAMARA
+
+        if camara_libre:
+            if tecla_pulsada[K_RIGHT]:
+                pos_camara[0] += 1
+            if tecla_pulsada[K_LEFT]:
+                pos_camara[0] -= 1
+            if tecla_pulsada[K_UP]:
+                pos_camara[1] += 1
+            if tecla_pulsada[K_DOWN]:
+                pos_camara[1] -= 1
+        else:
+            pos_camara[0] = pj.pos[0]-(ANCHO_PANTALLA_GL/2-ANCHO_CADRO/2)
+            pos_camara[1] = pj.pos[1]-(ALTO_PANTALLA_GL/2-ALTO_CADRO)
+
+            pos_camara[0] = max(pos_camara[0], 0)
+            pos_camara[0] = min(pos_camara[0], ANCHO_FASE-ANCHO_PANTALLA_GL)
+
+            pos_camara[1] = max(pos_camara[1], 0)
+            pos_camara[1] = min(pos_camara[1], ALTO_FASE-ALTO_PANTALLA_GL)
 
         pygame.display.flip()
 
