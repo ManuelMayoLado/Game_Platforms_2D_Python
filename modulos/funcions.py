@@ -87,7 +87,7 @@ def distancia_sujeto_cadro(sujeto,lista_cadros):
         distancia = sujeto.pos[1]-(y*ALTO_CADRO+ALTO_CADRO)
         return distancia
     else:
-        return "nada"
+        return None
 
 
 #### OPENGL ####

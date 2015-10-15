@@ -186,11 +186,15 @@ def main():
             glVertex2f(c[0]*ANCHO_CADRO,c[1]*ALTO_CADRO+c[3])
         glEnd()
 
-        if distancia <= 0 and pj.fisica.vel[1] <= 0:
-            pj.fisica.vel[1] = 0
-            if ALTO_CADRO > abs(distancia) > 1:
-                pj.pos = [pj.pos[0],pj.pos[1]-distancia]
-            pj_en_suelo = True
+        if distancia:
+            if distancia <= 0 and pj.fisica.vel[1] <= 0:
+                pj.fisica.vel[1] = 0
+                if ALTO_CADRO > abs(distancia) > 0.2:
+                    pj.pos = [pj.pos[0],pj.pos[1]-distancia]
+                pj_en_suelo = True
+            else:
+                pj.fisica.vel[1] -= pj.fisica.gravedad
+                pj_en_suelo = False
         else:
             pj.fisica.vel[1] -= pj.fisica.gravedad
             pj_en_suelo = False
@@ -204,7 +208,9 @@ def main():
             if impulso[2] <= 0:
                 pj.fisica.impulsos.remove(impulso)
 
-        pj.pos = pj.pos[0]+pj.fisica.vel[0],pj.pos[1]+pj.fisica.vel[1]
+
+        pj.pos[0] = pj.pos[0]+pj.fisica.vel[0]
+        pj.pos[1] = pj.pos[1] + pj.fisica.vel[1]
 
 
         ############################################
