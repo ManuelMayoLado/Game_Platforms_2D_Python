@@ -24,3 +24,10 @@ class personaxe:
         self.pos = pos
         self.estado = estado
         self.fisica = fisica
+
+class rectangulo:
+    def __init__(self, x, y, ancho, alto):
+        self.x = x
+        self.y = y
+        self.ancho = ancho
+        self.alto = alto

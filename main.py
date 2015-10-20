@@ -81,6 +81,10 @@ def main():
     #BUCLE XOGO
     #-----------------
 
+    ''''''
+    rect1 = rectangulo(60,65,10,10)
+    cont_col = 0
+
     while _ON:
 
         reloj = pygame.time.Clock()
@@ -168,6 +172,18 @@ def main():
         if mostrar_cadricula:
             glCallList(ID_LISTA_CADRICULA)
 
+        ''' PROBA '''
+
+        glColor4f(1, 0.5, 1, 0.5)
+        debuxar_rect_gl2(rect1)
+
+        rect_pj = rectangulo(pj.pos[0],pj.pos[1],ANCHO_CADRO,ALTO_CADRO*2)
+
+        if colision_rect(rect_pj,rect1):
+            print 'COLISIONANDO',cont_col
+            cont_col += 1
+
+
         ###########################################
         #FISICA
         ###########################################
@@ -211,7 +227,6 @@ def main():
 
         pj.pos[0] = pj.pos[0]+pj.fisica.vel[0]
         pj.pos[1] = pj.pos[1] + pj.fisica.vel[1]
-
 
         ############################################
         #EVENTOS

@@ -75,7 +75,6 @@ def cadros_inferiores(sujeto,lista,cadrados_ancho,ancho_fase,alto_fase):
                     lista_cadros.append([pos(n,cadrados_ancho)[0],pos(n,cadrados_ancho)[1],ANCHO_CADRO,ALTO_CADRO])
             except:
                 None
-
     return lista_cadros
 
 def distancia_sujeto_cadro(sujeto,lista_cadros):
@@ -88,6 +87,13 @@ def distancia_sujeto_cadro(sujeto,lista_cadros):
         return distancia
     else:
         return None
+
+def colision_rect(rect1,rect2):
+    if (rect1.x+rect1.ancho > rect2.x and rect1.x < rect2.x+rect2.ancho
+        and rect1.y+rect1.alto > rect2.y and rect1.y < rect2.y+rect2.alto):
+        return True
+    else:
+        return False
 
 
 #### OPENGL ####
@@ -124,6 +130,15 @@ def debuxar_rect_gl(vertices,pos=False):
         glVertex2f(vertices[v+2][0],vertices[v+2][1])
         glTexCoord2f(0,1)
         glVertex2f(vertices[v+3][0],vertices[v+3][1])
+    glEnd()
+
+def debuxar_rect_gl2(rect):
+    glLoadIdentity()
+    glBegin(GL_QUADS)
+    glVertex2f(rect.x,rect.y)
+    glVertex2f(rect.x+rect.ancho,rect.y)
+    glVertex2f(rect.x+rect.ancho,rect.y+rect.alto)
+    glVertex2f(rect.x,rect.y+rect.alto)
     glEnd()
 
 def debuxar_pj(posicion):
