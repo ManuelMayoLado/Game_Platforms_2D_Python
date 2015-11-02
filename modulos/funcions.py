@@ -57,8 +57,8 @@ def cargar_fase(fase):
 
 def cadros_inferiores(sujeto,lista,cadrados_ancho,ancho_fase,alto_fase):
     lista_cadros = []
-    if (sujeto.pos[0] > -ANCHO_CADRO and sujeto.pos[0] < ancho_fase+ANCHO_CADRO
-        or
+    if (sujeto.pos[0] > -ANCHO_CADRO and sujeto.pos[0] < ancho_fase
+        and
         sujeto.pos[1] > -ALTO_CADRO and sujeto.pos[1] < alto_fase+ALTO_CADRO):
         pos_cadro_sujeto = int(sujeto.pos[0]/ANCHO_CADRO), int(sujeto.pos[1]/ALTO_CADRO)
         num_cadro_sujeto = num(pos_cadro_sujeto,cadrados_ancho)
