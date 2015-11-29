@@ -3,7 +3,6 @@
 ###LIBRERIAS NECESARIAS###
 #pygame
 #pyOpenGL
-#Box2D
 
 from __future__ import division
 
